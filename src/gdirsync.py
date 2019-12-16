@@ -57,6 +57,7 @@ class GSync(ExcThread):
 def main():
     """Entry point for gdirsync."""
     # PySimpleGUI Layout
+    progress_bar_len = 1000
     layout = [
         [
             sg.Text("Source Directory", size=(20, 1)),
@@ -82,59 +83,65 @@ def main():
             ),
         ],
         [sg.Button("Sync", key="syncButton")],
-        [sg.ProgressBar(1000, orientation="h", size=(50, 20), key="progressBar")],
+        [
+            sg.ProgressBar(
+                progress_bar_len, orientation="h", size=(50, 20), key="progressBar"
+            )
+        ],
     ]
     window = sg.Window("Gdirsync").Layout(layout)
     source_dir_browse = window["sourceDirBrowse"]
     target_dir_browse = window["targetDirBrowse"]
     sync_button = window["syncButton"]
     progress_bar = window["progressBar"]
+    syncing = False
+
+    def reset_main_window(syncing, progress_loop):
+        """Internal function to reset main window elements."""
+        source_dir_browse.update(disabled=False)
+        target_dir_browse.update(disabled=False)
+        sync_button.update("Sync")
+        sync_button.update(disabled=False)
+        syncing = False
+        progress_loop = 0
+        progress_bar.UpdateBar(progress_loop)
+        return syncing, progress_loop
 
     # App Logic
+    progress_loop = 0
     while True:
-        event, values = window.read(timeout=50)
+        event, values = window.read(timeout=100)
         if event is None:
-            sys.exit()
-        elif event == "syncButton":
+            break
+        elif not syncing and event == "syncButton":
             source_dir = values[0]
             target_dir = values[1]
             if source_dir is "" or target_dir is "":
+                source_dir_browse.update(disabled=True)
+                target_dir_browse.update(disabled=True)
+                sync_button.update(disabled=True)
                 sg.Popup("Please complete all fields")
+                syncing, progress_loop = reset_main_window(syncing, progress_loop)
             else:
                 t1 = GSync(
                     source_dir, target_dir, "sync", purge=values[2], create=values[3]
                 )
                 t1.start()
+                syncing = True
                 source_dir_browse.update(disabled=True)
                 target_dir_browse.update(disabled=True)
-                sync_button.update("Cancel")
-
-                i = 0
-                while True:
-                    event, value = window.Read(timeout=100)
-                    if not t1.is_alive():
-                        t1.join()
-                        i = 0
-                        progress_bar.UpdateBar(i)
-                        sync_button.update(disabled=True)
-                        sg.Popup("Sync Complete")
-                        source_dir_browse.update(disabled=False)
-                        target_dir_browse.update(disabled=False)
-                        sync_button.update("Sync")
-                        sync_button.update(disabled=False)
-                        break
-                    if event is None:
-                        sys.exit()  # TODO kill thread and popup warning
-                    elif event == "syncButton":
-                        source_dir_browse.update(disabled=False)
-                        target_dir_browse.update(disabled=False)
-                        sync_button.update("Sync")
-                        # TODO cancel
-                    elif event == sg.TIMEOUT_KEY:
-                        progress_bar.UpdateBar(i)
-                        i += 1
-                        if i >= 1000:
-                            i = 1
+                sync_button.update(disabled=True)
+        elif syncing and not t1.is_alive():
+            t1.join()
+            sg.Popup("Sync Complete")
+            syncing, progress_loop = reset_main_window(syncing, progress_loop)
+        elif syncing and event == sg.TIMEOUT_KEY:
+            progress_bar.UpdateBar(progress_loop)
+            progress_loop += 1
+            if progress_loop >= progress_bar_len:
+                progress_loop = 1
+    if syncing:
+        t1.join()
 
 
 if __name__ == "__main__":
