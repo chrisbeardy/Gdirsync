@@ -107,30 +107,44 @@ def main():
                 reset_main_window()
             else:
                 p = GSync(
-                        source_dir,
-                        target_dir,
-                        "sync",
-                        purge=values[2],
-                        create=values[3],
-                    )
+                    source_dir, target_dir, "sync", purge=values[2], create=values[3]
+                )
                 sync_jobs.append(p)
                 source_dirs.append(source_dir)
                 target_dirs.append(target_dir)
                 completed_jobs.append(False)
                 p.start()
-                sg.Popup("Syncing " + source_dir + " to " + target_dir, title="Syncing...", auto_close=True, auto_close_duration=2, non_blocking=True)
+                sg.Popup(
+                    "Syncing " + source_dir + " to " + target_dir,
+                    title="Syncing...",
+                    auto_close=True,
+                    auto_close_duration=2,
+                    non_blocking=True,
+                )
 
         for i in range(len(sync_jobs)):
             if not sync_jobs[i].is_alive() and not completed_jobs[i]:
-                sg.Popup("Sync from " + source_dirs[i] + " to " + target_dirs[i] + " complete ", title="Gdirsync - Sync Complete", non_blocking=True)
+                sg.Popup(
+                    "Sync from "
+                    + source_dirs[i]
+                    + " to "
+                    + target_dirs[i]
+                    + " complete ",
+                    title="Gdirsync - Sync Complete",
+                    non_blocking=True,
+                )
                 completed_jobs[i] = True
 
     window.close()
 
     for job in sync_jobs:
         if job.is_alive():
-            jobs_running_layout = [[sg.Text("Existing sync jobs will continue in the background")]]
-            jobs_running_window = sg.Window("Syncing...", jobs_running_layout, disable_close=True)
+            jobs_running_layout = [
+                [sg.Text("Existing sync jobs will continue in the background")]
+            ]
+            jobs_running_window = sg.Window(
+                "Syncing...", jobs_running_layout, disable_close=True
+            )
             jobs_running_window.read(timeout=2000)
             jobs_running_window.hide()
             jobs_running_window.close()
@@ -139,7 +153,14 @@ def main():
     while True:
         for i in range(len(sync_jobs)):
             if not sync_jobs[i].is_alive() and not completed_jobs[i]:
-                sg.Popup("Sync from " + source_dirs[i] + " to " + target_dirs[i] + " complete ", title="Gdirsync - Sync Complete")
+                sg.Popup(
+                    "Sync from "
+                    + source_dirs[i]
+                    + " to "
+                    + target_dirs[i]
+                    + " complete ",
+                    title="Gdirsync - Sync Complete",
+                )
                 completed_jobs[i] = True
 
         all_jobs_complete = True  # TODO remove iteration
