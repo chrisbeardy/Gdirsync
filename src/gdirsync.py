@@ -14,12 +14,10 @@ class ExcProcess(multiprocessing.Process):
     def run(self):
         self.exc = None
         try:
-            # Possibly throws an exception
             self.exc_run()
         except Exception as e:
             self.exc = sys.exc_info()
-            # Save details of the exception thrown but don't rethrow,
-            # just complete the function
+            # Save details of the exception thrown but don't rethrow
 
 
 class GSync(ExcProcess):
@@ -47,7 +45,13 @@ class GSync(ExcProcess):
 
 
 def main():
-    """Entry point for gdirsync."""
+    """Entry point for gdirsync.
+
+    Sets up main window so user can start sync jobs.
+    If sync jobs are still running when user closes window,
+    waits for syncing to end then alerts user.
+
+    """
     # PySimpleGUI Layout
     layout = [
         [
@@ -80,18 +84,24 @@ def main():
     target_dir_browse = window["targetDirBrowse"]
     sync_button = window["syncButton"]
 
+    def disable_inputs():
+        """Internal function to disable inputs"""
+        source_dir_browse.update(disabled=True)
+        target_dir_browse.update(disabled=True)
+        sync_button.update(disabled=True)
+
     def reset_main_window():
         """Internal function to reset main window elements."""
         source_dir_browse.update(disabled=False)
         target_dir_browse.update(disabled=False)
-        sync_button.update("Sync")
         sync_button.update(disabled=False)
 
-    # App Logic
+    # App Logic - Main persistent window
     sync_jobs = []
     source_dirs = []
     target_dirs = []
     completed_jobs = []
+
     while True:
         event, values = window.read(timeout=500)
         if event is None:
@@ -100,10 +110,8 @@ def main():
             source_dir = values[0]
             target_dir = values[1]
             if source_dir is "" or target_dir is "":
-                source_dir_browse.update(disabled=True)
-                target_dir_browse.update(disabled=True)
-                sync_button.update(disabled=True)
-                sg.Popup("Please complete all fields")
+                disable_inputs()
+                sg.PopupAutoClose("Please complete all fields", title="Gdirsync")
                 reset_main_window()
             else:
                 p = GSync(
@@ -114,45 +122,38 @@ def main():
                 target_dirs.append(target_dir)
                 completed_jobs.append(False)
                 p.start()
-                sg.Popup(
-                    "Syncing " + source_dir + " to " + target_dir,
-                    title="Syncing...",
-                    auto_close=True,
-                    auto_close_duration=2,
-                    non_blocking=True,
+                disable_inputs()
+                sg.PopupAutoClose(
+                    "Syncing " + source_dir + " to " + target_dir, title="Syncing..."
                 )
+                reset_main_window()
 
         for i in range(len(sync_jobs)):
             if not sync_jobs[i].is_alive() and not completed_jobs[i]:
-                sg.Popup(
+                sg.PopupNonBlocking(
                     "Sync from "
                     + source_dirs[i]
                     + " to "
                     + target_dirs[i]
                     + " complete ",
                     title="Gdirsync - Sync Complete",
-                    non_blocking=True,
                 )
                 completed_jobs[i] = True
 
-    window.close()
-
+    # main window closed
+    # check for and complete current running sync jobs in the background
     for job in sync_jobs:
         if job.is_alive():
-            jobs_running_layout = [
-                [sg.Text("Existing sync jobs will continue in the background")]
-            ]
-            jobs_running_window = sg.Window(
-                "Syncing...", jobs_running_layout, disable_close=True
+            sg.PopupAutoClose(
+                "Existing sync jobs will continue in the background",
+                title="Gdirsync - Syncing...",
             )
-            jobs_running_window.read(timeout=2000)
-            jobs_running_window.hide()
-            jobs_running_window.close()
             break
 
     while True:
         for i in range(len(sync_jobs)):
             if not sync_jobs[i].is_alive() and not completed_jobs[i]:
+                # blocking popup here otherwise program will exit causing windows to close
                 sg.Popup(
                     "Sync from "
                     + source_dirs[i]
@@ -163,7 +164,7 @@ def main():
                 )
                 completed_jobs[i] = True
 
-        all_jobs_complete = True  # TODO remove iteration
+        all_jobs_complete = True
         for i in range(len(sync_jobs)):
             if not completed_jobs[i]:
                 all_jobs_complete = False
