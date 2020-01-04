@@ -1,0 +1,2 @@
+dirsync==2.2.4
+PySimpleGUI==4.14.1
