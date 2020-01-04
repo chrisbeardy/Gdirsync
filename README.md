@@ -6,9 +6,8 @@ Gdirsync at its simplest is a GUI wrapper for the dirsync library https://pypi.o
 ## Running the program using python
 Clone the repository and run the python file
 ```
-mkdir gdirsync
-cd gdirsync
 git clone https://github.com/chrisbeardy/Gdirsync.git
+cd Gdirsync
 pip install -r requirements.txt
 python src/gdirsync.py 
 ```
