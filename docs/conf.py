@@ -18,7 +18,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'Gdirsync'
-copyright = '2019, Christopher Beard'
+copyright = '2020, Christopher Beard'
 author = 'Christopher Beard'
 
 # The full version, including alpha/beta/rc tags
