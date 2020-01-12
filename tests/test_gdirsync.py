@@ -1,10 +1,10 @@
 import unittest
 
 
-class gdirsyncTest(unittest.TestCase):
+class GdirsyncTest(unittest.TestCase):
     """Unittests for gdirsync"""
 
-    def sample_test(self):
+    def test_sample(self):
         """sample test"""
         a = 5
         self.assertEqual(a, 5)
