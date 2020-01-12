@@ -9,6 +9,6 @@ class gdirsyncTest(unittest.TestCase):
         a = 5
         self.assertEqual(a, 5)
 
-tox
+
 if __name__ == "__main__":
     unittest.main()

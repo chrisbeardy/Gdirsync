@@ -3,7 +3,7 @@
 block_cipher = None
 
 
-a = Analysis(['src/gdirsync.py'],
+a = Analysis(['gdirsync/gdirsync.py'],
              pathex=[],
              binaries=[],
              datas=[],
