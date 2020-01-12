@@ -56,12 +56,12 @@ def main():
     layout = [
         [
             sg.Text("Source Directory", size=(20, 1)),
-            sg.InputText(do_not_clear=True),
+            sg.InputText(),
             sg.FolderBrowse(key="sourceDirBrowse"),
         ],
         [
             sg.Text("Target Directory", size=(20, 1)),
-            sg.InputText(do_not_clear=True),
+            sg.InputText(),
             sg.FolderBrowse(key="targetDirBrowse"),
         ],
         [sg.Text("Options")],

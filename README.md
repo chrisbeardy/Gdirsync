@@ -9,7 +9,7 @@ Clone the repository and run the python file
 git clone https://github.com/chrisbeardy/Gdirsync.git
 cd Gdirsync
 pip install -r requirements.txt
-python src/gdirsync.py 
+python gdirsync/gdirsync.py 
 ```
 
 ## Development and build
@@ -21,7 +21,7 @@ pip install -r requirements.txt
 pip install -r requirements-dev.txt
 ```
 
-use pyinstaller to build
+use pyinstaller to build an executable
 
 ```
 pyinstaller gdirsync.spec
