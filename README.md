@@ -1,4 +1,9 @@
 # Gdirsync
+
+[![Build Status](https://travis-ci.com/chrisbeardy/Gdirsync.svg?branch=master)](https://travis-ci.com/chrisbeardy/Gdirsync)
+[![Documentation Status](https://readthedocs.org/projects/gdirsync/badge/?version=latest)](https://gdirsync.readthedocs.io/en/latest/?badge=latest)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 Gdirsync is a simple multi-platform file syncing tool written in python.
  
 Gdirsync at its simplest is a GUI wrapper for the dirsync library https://pypi.org/project/dirsync/
