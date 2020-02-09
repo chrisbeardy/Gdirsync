@@ -8,6 +8,8 @@ Gdirsync is a simple multi-platform file syncing tool written in python.
  
 Gdirsync at its simplest is a GUI wrapper for the dirsync library https://pypi.org/project/dirsync/
 
+![main_screenshot](resources/main_screenshot.png)
+
 ## Running the program using python
 Clone the repository and run the python file
 ```
