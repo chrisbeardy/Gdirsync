@@ -10,7 +10,7 @@ packaging==19.2
 pathspec==0.7.0
 pluggy==0.13.1
 py==1.8.1
-PyInstaller==3.5
+PyInstaller==3.6
 pyparsing==2.4.6
 regex==2019.12.20
 six==1.13.0
